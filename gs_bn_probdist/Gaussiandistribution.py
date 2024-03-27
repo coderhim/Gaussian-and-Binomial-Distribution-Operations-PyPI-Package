@@ -1,6 +1,11 @@
 import math
 import matplotlib.pyplot as plt
 from .Generaldistribution import Distribution
+import numpy as np
+from .Schedule import linear_schedule, cosine_schedule
+
+
+    
 
 class Gaussian(Distribution):
 	""" Gaussian distribution class for calculating and 
@@ -12,11 +17,17 @@ class Gaussian(Distribution):
 		data_list (list of floats) a list of floats extracted from the data file
 			
 	"""
-	def __init__(self, mu=0, sigma=1):
-		
-		Distribution.__init__(self, mu, sigma)
+	def __init__(self, mu=0, sigma=1, schedule=None):
+        Distribution.__init__(self, mu, sigma)
+        self.schedule = schedule
 	
-		
+	def generate_noise_at_step(self, image_shape, current_step, total_steps):
+        """Generate noise for a specific step using the schedule."""
+        noise_scale = 1.0
+        if self.schedule:
+            noise_scale = self.schedule(current_step, total_steps)
+        noise_matrix = np.random.normal(self.mean, self.stdev, image_shape)
+        return noise_matrix * noise_scale	
 	
 	def calculate_mean(self):
 	
